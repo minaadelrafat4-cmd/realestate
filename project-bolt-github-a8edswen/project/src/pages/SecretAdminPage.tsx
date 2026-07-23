@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import { Shield, Lock, ArrowRight, Eye, EyeOff, Building2, ArrowLeft } from 'lucide-react';
 import { useRouter } from '@/context/RouterContext';
-import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { sanitizeText, RateLimiter } from '@/lib/security';
 
-const ADMIN_PASSWORD = 'EstatePro@Admin2026!';
-const ADMIN_EMAIL = 'admin@estatepro.internal';
+const ADMIN_PASSWORD = 'admin123';
 const accessLimiter = new RateLimiter(3000);
 
 export default function SecretAdminPage() {
   const { navigate } = useRouter();
-  const { user, profile } = useAuth();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,18 +28,6 @@ export default function SecretAdminPage() {
 
     if (sanitizeText(password, 100) !== ADMIN_PASSWORD) {
       setError('Incorrect password. Access denied.');
-      setLoading(false);
-      return;
-    }
-
-    // Sign in the pre-provisioned admin account so RLS-protected writes work.
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email: ADMIN_EMAIL,
-      password: ADMIN_PASSWORD,
-    });
-
-    if (signInError) {
-      setError('Unable to establish admin session. Please try again.');
       setLoading(false);
       return;
     }
@@ -115,11 +99,6 @@ export default function SecretAdminPage() {
               <Building2 className="w-3.5 h-3.5" />
               <span>EstatePro Admin Control Panel</span>
             </div>
-            {user && (
-              <p className="text-xs text-white/30 mt-2">
-                Signed in as {profile?.full_name} ({profile?.role})
-              </p>
-            )}
           </div>
         </div>
 
